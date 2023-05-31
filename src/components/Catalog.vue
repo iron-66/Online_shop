@@ -35,6 +35,8 @@
         :title="product.title"
         :price="product.price"
         :image="product.image"
+        @add-to-favorites="addFavorite"
+        @remove-from-favorites="removeFavorite"
       />
     </div>
     <div class="pagination">
@@ -62,7 +64,7 @@ export default defineComponent({
   data() {
     return {
       products: [] as Product[],
-      favorites: [] as Product[],
+      favorites: [] as string[],
       searchText: '',
       sortOption: '',
       currentPage: 1,
@@ -126,6 +128,17 @@ export default defineComponent({
     },
     changePage(page: number): void {
       this.currentPage = page;
+    },
+    addFavorite(title: string) {
+      this.favorites.push(title);
+      localStorage.setItem('favorites', JSON.stringify(this.favorites));
+    },
+    removeFavorite(title: string) {
+      const index = this.favorites.indexOf(title);
+      if (index !== -1) {
+        this.favorites.splice(index, 1);
+        localStorage.setItem('favorites', JSON.stringify(this.favorites));
+      }
     },
   },
   computed: {

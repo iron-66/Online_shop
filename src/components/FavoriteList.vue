@@ -1,38 +1,47 @@
 <template>
-    <div class="favorite-list-overlay">
-      <div class="favorite-list" :style="{ height: listHeight + 'px' }">
-        <h2 class="list-title">Избранное</h2>
-        <ul>
-          <li v-for="product in favoriteProducts" :key="product.id">
-            <p>{{ product.title }}</p>
-            <p>{{ product.price }}</p>
-            <div class="product-actions">
-              <button @click="removeFromFavorites(product)">Удалить</button>
-              <button>Добавить в корзину</button>
-            </div>
-          </li>
-        </ul>
-        <button class="close-button" @click="$emit('close')">Закрыть</button>
-      </div>
+  <div class="favorite-list-overlay">
+    <div class="favorite-list" :style="{ height: listHeight + 'px' }">
+      <h2 class="list-title">Избранное</h2>
+      <ul>
+        <li v-for="product in favoriteProducts" :key="product.title">
+          <p>{{ product.title }}</p>
+          <p>{{ product.price }}</p>
+          <div class="product-actions">
+            <button @click="removeFromFavorites(product)">Удалить</button>
+            <button>Добавить в корзину</button>
+          </div>
+        </li>
+      </ul>
+      <button class="close-button" @click="$emit('close')">Закрыть</button>
     </div>
+  </div>
 </template>
   
 <script lang="ts">
 import { defineComponent, ref, computed, watch } from 'vue';
 
 interface Product {
-    id: number;
-    title: string;
-    price: number;
+  image: string;
+  title: string;
+  price: number;
 }
 
 export default defineComponent({
     name: 'FavoriteList',
+    props: {
+      favoriteProducts: {
+        type: Array as () => Product[], // Добавление типа массива Product
+        required: true,
+      },
+    },
     setup() {
         const favoriteProducts = ref<Product[]>([]);
 
         const removeFromFavorites = (product: Product) => {
-            // Логика удаления товара из избранного
+          const index = favoriteProducts.value.findIndex((p) => p.title === product.title);
+            if (index !== -1) {
+              favoriteProducts.value.splice(index, 1);
+            }
         };
 
         return {

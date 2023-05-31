@@ -9,22 +9,28 @@
           <a href="#">Контакты</a>
         </nav>
         <div class="right-section">
-          <a class="fav" @click="toggleFavoriteList"><img src="@/assets/star-mark.png" width="51" height="51"></a>
+          <a class="favorites" @click="toggleFavoriteList"><img src="@/assets/star-mark.png" width="51" height="51"></a>
           <a class="cart"><img src="@/assets/shopping-cart.png" width="58" height="58"></a>
           <div class="counter-circle"><div id="counter" class="counter">0</div></div>
         </div>
       </div>
     </header>
     <main>
-      <router-view />
+      <router-view @add-to-favorites="addToFavorites" />
     </main>
-    <FavoriteList v-if="isFavoriteListOpen" @close="toggleFavoriteList"/>
+    <FavoriteList v-if="isFavoriteListOpen" :favoriteProducts="favoriteProducts" @removeFromFavorites="removeFromFavorites" @close="toggleFavoriteList" />
   </div>
 </template>
 
 <script lang="ts">
-  import { ref, computed } from 'vue';
+  import { ref, computed, Ref } from 'vue';
   import FavoriteList from './components/FavoriteList.vue';
+
+  interface Product {
+    title: string;
+    price: number;
+    image: string;
+  }
 
   export default {
     name: 'App',
@@ -33,21 +39,29 @@
     },
     setup() {
       const isFavoriteListOpen = ref(false);
+      const favoriteProducts: Ref<Product[]> = ref([]);
 
       const toggleFavoriteList = () => {
         isFavoriteListOpen.value = !isFavoriteListOpen.value;
       };
 
-      const favoriteCount = computed(() => {
-        // Логика для подсчета количества избранных товаров из LocalStorage
-        // Реализуйте соответствующую логику для чтения и обновления списка избранных товаров в LocalStorage
-        return 0;
-      });
+      const addToFavorites = (product: Product) => {
+        favoriteProducts.value.push(product);
+      };
+
+      const removeFromFavorites = (product: Product) => {
+        const index = favoriteProducts.value.findIndex((p) => p.title === product.title);
+        if (index !== -1) {
+          favoriteProducts.value.splice(index, 1);
+        }
+      };
 
       return {
         isFavoriteListOpen,
         toggleFavoriteList,
-        favoriteCount,
+        favoriteProducts,
+        addToFavorites,
+        removeFromFavorites,
       };
     },
   };
@@ -94,7 +108,7 @@
 
 .logo-text,
 .nav,
-.fav{
+.favorites {
   flex: 1;
 }
 

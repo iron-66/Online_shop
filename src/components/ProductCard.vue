@@ -4,11 +4,10 @@
     <h3>{{ title }}</h3>
     <p class="product-price"><span class="currency-icon">$</span>{{ price }}</p>
     <div class="product-actions">
-      <button v-if="!isFavorite" class="add-to-favorites">Добавить в избранное</button>
-      <button v-else class="remove-from-favorites">Удалить из избранного</button>
+      <button v-if="!isFavorite" class="add-to-favorites" @click="addToFavorites">Добавить в избранное</button>
+      <button v-else class="remove-from-favorites" @click="removeFromFavorites">Удалить из избранного</button>
       <button class="add-to-cart">Добавить в корзину</button>
     </div>
-    <!-- Другие детали товара -->
   </div>
 </template>
 
@@ -34,6 +33,24 @@
       return {
         isFavorite: false,
       };
+    },
+    methods: {
+      addToFavorites() {
+        this.isFavorite = true;
+        this.$emit('add-to-favorites', {
+          title: this.title,
+          price: this.price,
+          image: this.image,
+        });
+      },
+      removeFromFavorites() {
+        this.isFavorite = false;
+        this.$emit('remove-from-favorites', {
+          title: this.title,
+          price: this.price,
+          image: this.image,
+        });
+      },
     },
   });
 </script>
