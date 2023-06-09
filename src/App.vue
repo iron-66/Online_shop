@@ -90,7 +90,7 @@
   align-items: center;
   background-color: #ffffff;
   border: 1px solid #434343;
-  padding: 0% 30px;
+  padding: 0px 30px;
   height: 80px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
