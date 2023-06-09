@@ -6,8 +6,9 @@
       <p class="product-price"><span class="currency-icon">$</span>{{ price }}</p>
       <div class="product-actions">
         <button v-if="!isFavorite" class="add-to-favorites" @click="addToFav">Добавить в избранное</button>
-        <button v-else class="remove-from-favorites" @click="removeFromFavorites">Удалить из избранного</button>
-        <button class="add-to-cart">Добавить в корзину</button>
+        <button v-else class="remove-from-favorites" @click="removeFromFav">Удалить из избранного</button>
+        <button v-if="!inCart" class="add-to-cart" @click="addCart">Добавить в корзину</button>
+        <button v-else class="remove-from-cart" @click="removeCart">Удалить из корзины</button>
       </div>
     </div>
   </div>
@@ -45,10 +46,11 @@
     data() {
       return {
         isFavorite: false,
+        inCart: false,
       };
     },
     methods: {
-      ...mapMutations(['addToFavorites']),
+      ...mapMutations(['addToFavorites', 'removeFromFavorites', 'addToCart', 'removeFromCart']),
       addToFav(): void {
         this.isFavorite = true;
         const product: Product = {
@@ -58,8 +60,30 @@
         };
         this.addToFavorites(product);
       },
-      removeFromFavorites(): void {
+      removeFromFav(): void {
         this.isFavorite = false;
+        this.removeFromFavorites({
+          title: this.title,
+          price: this.price,
+          image: this.image,
+        });
+      },
+      addCart(): void {
+        this.inCart = true;
+        const product: Product = {
+          title: this.title,
+          price: this.price,
+          image: this.image,
+        };
+        this.addToCart(product);
+      },
+      removeCart(): void {
+        this.inCart = false;
+        this.removeFromCart({
+          title: this.title,
+          price: this.price,
+          image: this.image,
+        });
       },
     },
   });
@@ -99,7 +123,8 @@
 
 .add-to-favorites,
 .remove-from-favorites,
-.add-to-cart {
+.add-to-cart,
+.remove-from-cart {
   padding: 10px 20px;
   background-color: #D9D9D9;
   border: none;

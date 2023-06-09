@@ -1,14 +1,15 @@
 <template>
-  <div class="favorite-list-overlay">
-    <div class="favorite-list">
+  <div class="cart-list-overlay">
+    <div class="cart-list">
       <h2 class="list-title">Корзина</h2>
       <ul class="body">
-        <li v-for="(product, index) in favoriteProducts" :key="index">
+        <li v-for="(product, index) in cartProducts" :key="index">
           <h3 class = "title">{{ product.title }}</h3>
           <p class="product-price"><span class="currency-icon">$</span>{{ product.price }}</p>
         </li>
       </ul>
       <button class="close-button" @click="$emit('close')">Закрыть</button>
+      <button class="сheckout-button" @click="notify">Оформить заказ</button>
     </div>
   </div>
 </template>
@@ -24,10 +25,22 @@
   }
 
   export default defineComponent({
+    methods: {
+      notify(): void {
+        const cartProd: Product[] = this.cartProducts;
+        if (cartProd.length > 0) {
+          alert('Спасибо за заказ!');
+          window.location.reload();
+        }
+        else {
+          alert('Для оформления заказа добавьте товары в корзину');
+        }
+      }
+    },
     computed: {
-      favoriteProducts(): Product[] {
+      cartProducts(): Product[] {
         const store = useStore();
-        return store.state.favoriteProducts;
+        return store.state.cartProducts;
       },
     },
   });
@@ -35,7 +48,7 @@
 
   
 <style scoped>
-.favorite-list-overlay {
+.cart-list-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -48,7 +61,7 @@
   align-items: center;
 }
 
-.favorite-list {
+.cart-list {
   background-color: #FFFFFF;
   width: 800px;
   padding: 20px;
@@ -80,7 +93,7 @@
   justify-content: space-between;
 }
 
-.favorite-list ul {
+.cart-list ul {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -88,14 +101,14 @@
   overflow-y: auto;
 }
 
-.favorite-list li {
+.cart-list li {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 10px;
 }
 
-.favorite-list .product-actions button {
+.cart-list .product-actions button {
   padding: 10px 15px;
   background-color: #D9D9D9;
   color: #434343;
@@ -104,14 +117,15 @@
   cursor: pointer;
 }
 
-.favorite-list .product-actions button:hover {
+.cart-list .product-actions button:hover {
   background-color: #a7a7a7;
 }
 
-.favorite-list button {
+.cart-list button {
   margin-top: 20px;
 }
 
+.сheckout-button,
 .close-button {
   margin-top: auto;
   padding: 10px 15px;
