@@ -1,7 +1,7 @@
 <template>
   <div class="favorite-list-overlay">
     <div class="favorite-list">
-      <h2 class="list-title">Избранное</h2>
+      <h2 class="list-title">Корзина</h2>
       <ul class="body">
         <li v-for="(product, index) in favoriteProducts" :key="index">
           <h3 class = "title">{{ product.title }}</h3>

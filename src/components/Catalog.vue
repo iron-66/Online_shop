@@ -14,29 +14,26 @@
         <div class="control-label">Сортировка</div>
         <div class="input-field">
           <select v-model="sortOption" class="sort-menu">
-            <option value="alphabet">По возрастанию алфавита</option>
-      <option value="alphabetDesc">По убыванию алфавита</option>
-      <option value="price">По возрастанию цены</option>
-      <option value="priceDesc">По убыванию цены</option>
+            <option v-for="option in sortOptions" :value="option.value" :key="option.value">
+              {{ option.label }}
+            </option>
           </select>
         </div>
       </div>
       <div class="catalog-control">
         <div class="control-label">Фильтры</div>
         <div class="input-field">
-          <!-- Добавьте фильтры по вашему выбору -->
+          <!-- фильтры -->
         </div>
       </div>
     </div>
-    <div class="product-row" v-for="(row, rowIndex) in displayedProductRows" :key="rowIndex">
+    <div class="product-catalog">
       <ProductCard
-        v-for="(product, cardIndex) in row"
-        :key="cardIndex"
+        v-for="(product, index) in displayedProducts"
+        :key="index"
         :title="product.title"
         :price="product.price"
         :image="product.image"
-        @add-to-favorites="addFavorite"
-        @remove-from-favorites="removeFavorite"
       />
     </div>
     <div class="pagination">
@@ -64,11 +61,17 @@ export default defineComponent({
   data() {
     return {
       products: [] as Product[],
-      favorites: [] as string[],
+      favoriteProducts: [] as Product[],
       searchText: '',
       sortOption: '',
       currentPage: 1,
       itemsPerPage: 9,
+      sortOptions: [
+        { value: 'alphabet', label: 'По возрастанию алфавита' },
+        { value: 'alphabetDesc', label: 'По убыванию алфавита' },
+        { value: 'price', label: 'По возрастанию цены' },
+        { value: 'priceDesc', label: 'По убыванию цены' },
+      ],
     };
   },
   mounted() {
@@ -85,7 +88,7 @@ export default defineComponent({
     getFilteredProducts(): Product[] {
       const searchText = this.searchText.toLowerCase().trim();
 
-      if (searchText === '') {
+      if (!searchText) {
         return this.products;
       }
 
@@ -94,15 +97,16 @@ export default defineComponent({
       );
     },
     getSortedProducts(products: Product[]): Product[] {
-      if (this.sortOption === 'alphabet') {
-        return products.sort((a, b) => a.title.localeCompare(b.title));
-      } else if (this.sortOption === 'alphabetDesc') {
-        return products.sort((a, b) => b.title.localeCompare(a.title));
-      } else if (this.sortOption === 'price') {
-        return products.sort((a, b) => a.price - b.price);
-      } else if (this.sortOption === 'priceDesc') {
-        return products.sort((a, b) => b.price - a.price);
-      } else {
+      switch(this.sortOption) {
+        case 'alphabet':
+          return products.sort((a, b) => a.title.localeCompare(b.title));
+        case 'alphabetDesc':
+          return products.sort((a, b) => b.title.localeCompare(a.title));
+        case 'price':
+          return products.sort((a, b) => a.price - b.price);
+        case 'priceDesc':
+          return products.sort((a, b) => b.price - a.price);
+        default:
         return products;
       }
     },
@@ -129,20 +133,9 @@ export default defineComponent({
     changePage(page: number): void {
       this.currentPage = page;
     },
-    addFavorite(title: string) {
-      this.favorites.push(title);
-      localStorage.setItem('favorites', JSON.stringify(this.favorites));
-    },
-    removeFavorite(title: string) {
-      const index = this.favorites.indexOf(title);
-      if (index !== -1) {
-        this.favorites.splice(index, 1);
-        localStorage.setItem('favorites', JSON.stringify(this.favorites));
-      }
-    },
   },
   computed: {
-    displayedProductRows(): Product[][] {
+    displayedProducts(): Product[] {
       const filteredProducts = this.getFilteredProducts();
       const sortedProducts = this.getSortedProducts(filteredProducts);
 
@@ -150,17 +143,7 @@ export default defineComponent({
       const end = start + this.itemsPerPage;
       const paginatedProducts = sortedProducts.slice(start, end);
 
-      const rows = [];
-      let row = [];
-      for (let i = 0; i < paginatedProducts.length; i++) {
-        row.push(paginatedProducts[i]);
-        if ((i + 1) % 3 === 0 || i === paginatedProducts.length - 1) {
-          rows.push(row);
-          row = [];
-        }
-      }
-
-      return rows;
+      return paginatedProducts;
     },
     totalPages(): number {
       const filteredProducts = this.getFilteredProducts();
@@ -177,21 +160,21 @@ export default defineComponent({
 }
 
 .catalog-header {
-  margin-top: 104px;
-  margin-bottom: 78px;
+  margin-top: 100px;
+  margin-bottom: 80px;
 }
 
 .block-name {
   display: flex;
   justify-content: center;
-  font-size: 48px;
+  font-size: 50px;
 }
 
 .catalog-controls {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 57px 26px;
+  margin: 50px 25px;
   font-size: 30px;
 }
 
@@ -199,7 +182,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0px 26px;
+  margin: 0px 15px;
 }
 
 .control-label {
@@ -211,8 +194,7 @@ export default defineComponent({
 .input-field {
   background-color: #d9d9d9;
   width: 470px;
-  height: 66px;
-  margin-left: 10px;
+  height: 65px;
 }
 
 .search-input {
@@ -239,11 +221,13 @@ export default defineComponent({
   padding-left: 10px;
 }
 
-.product-row {
+.product-catalog {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 470px);
+  row-gap: 30px;
+  column-gap: 30px;
   align-items: center;
   justify-content: center;
-  display: flex;
-  flex-wrap: wrap;
 }
 
 .pagination {

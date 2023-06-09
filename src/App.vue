@@ -9,22 +9,24 @@
           <a href="#">Контакты</a>
         </nav>
         <div class="right-section">
-          <a class="favorites" @click="toggleFavoriteList"><img src="@/assets/star-mark.png" width="51" height="51"></a>
-          <a class="cart"><img src="@/assets/shopping-cart.png" width="58" height="58"></a>
+          <a class="favorites" @click="showFavorites = true"><img src="@/assets/star-mark.png" width="51" height="51"></a>
+          <a class="cart" @click="showCartPopup = true"><img src="@/assets/shopping-cart.png" width="58" height="58"></a>
           <div class="counter-circle"><div id="counter" class="counter">0</div></div>
         </div>
       </div>
     </header>
     <main>
-      <router-view @add-to-favorites="addToFavorites" />
+      <router-view/>
     </main>
-    <FavoriteList v-if="isFavoriteListOpen" :favoriteProducts="favoriteProducts" @removeFromFavorites="removeFromFavorites" @close="toggleFavoriteList" />
+    <FavoriteList v-if="showFavorites" :favoriteProducts="favoriteProducts" @close="showFavorites = false"/>
+    <CartPopup v-if="showCartPopup" :cartItems="cartItems" @close="showCartPopup = false" />
   </div>
 </template>
 
 <script lang="ts">
-  import { ref, computed, Ref } from 'vue';
+  import { defineComponent } from 'vue';
   import FavoriteList from './components/FavoriteList.vue';
+  import Cart from './components/Cart.vue';
 
   interface Product {
     title: string;
@@ -32,39 +34,20 @@
     image: string;
   }
 
-  export default {
-    name: 'App',
+  export default defineComponent({
     components: {
       FavoriteList,
+      Cart,
     },
-    setup() {
-      const isFavoriteListOpen = ref(false);
-      const favoriteProducts: Ref<Product[]> = ref([]);
-
-      const toggleFavoriteList = () => {
-        isFavoriteListOpen.value = !isFavoriteListOpen.value;
-      };
-
-      const addToFavorites = (product: Product) => {
-        favoriteProducts.value.push(product);
-      };
-
-      const removeFromFavorites = (product: Product) => {
-        const index = favoriteProducts.value.findIndex((p) => p.title === product.title);
-        if (index !== -1) {
-          favoriteProducts.value.splice(index, 1);
-        }
-      };
-
+    data() {
       return {
-        isFavoriteListOpen,
-        toggleFavoriteList,
-        favoriteProducts,
-        addToFavorites,
-        removeFromFavorites,
+        showFavorites: false,
+        favoriteProducts: [] as Product[],
+        showCartPopup: false,
+        cartItems: [],
       };
     },
-  };
+  });
 </script>
 
 <style>
